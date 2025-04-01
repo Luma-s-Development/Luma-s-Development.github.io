@@ -1,0 +1,807 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+:root {
+    --neon-blue: #0078d7;
+    --light-blue: #33b5e5;
+    --dark-blue: rgba(15, 30, 45, 0.9);
+    --dark-bg: rgba(15, 30, 45, 0.9);
+    --safe-zone: #36ff00;
+    --glow: rgba(0, 120, 215, 0.7);
+    --background: #111;
+    --text: #fff;
+    --danger-color: #ff3030;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+body {
+    background-color: transparent !important;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+body.sequence-active {
+    cursor: none !important; /* Hide cursor during sequence game */
+}
+
+#hack-container {
+    background: linear-gradient(135deg, rgba(15, 30, 45, 0.85) 0%, rgba(30, 60, 90, 0.85) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px; /* Increased border radius for more rounded corners */
+    width: 600px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    display: none;
+    overflow: hidden; /* Ensure no content spills outside the rounded corners */
+}
+
+/* Ensure all children inside the container respect parent's shape */
+.hack-title, .pulse-container, .hack-info, .timer-container, .hack-controls {
+    border-radius: 8px;
+}
+
+.hack-title {
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+    text-shadow: 0 0 10px var(--glow);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.blink {
+    animation: blink 1s infinite;
+    color: #ff6a00;
+}
+
+.pulse-container {
+    display: flex;
+    align-items: center;
+    height: 100px;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.wall {
+    width: 8px;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--light-blue), var(--neon-blue));
+    border-radius: 4px;
+    box-shadow: 0 0 10px var(--glow);
+}
+
+.pulse-track {
+    flex: 1;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+    margin: 0 5px;
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.safe-zone {
+    position: absolute;
+    background: linear-gradient(to bottom, rgba(54, 255, 0, 0.2), rgba(54, 255, 0, 0.4));
+    border: 1px solid rgba(54, 255, 0, 0.6);
+    height: 100%;
+    width: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px var(--safe-zone);
+    transition: left 0.3s ease-out;
+    border-radius: 4px;
+}
+
+.pulse-bar {
+    position: absolute;
+    width: 15px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--light-blue), var(--neon-blue));
+    border-radius: 4px;
+    box-shadow: 0 0 10px var(--glow);
+    left: 0;
+}
+
+.hack-info {
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.counter {
+    color: var(--light-blue);
+    font-size: 18px;
+}
+
+.message {
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.hack-controls {
+    display: flex;
+    justify-content: center;
+}
+
+#hack-button {
+    background: linear-gradient(to bottom, rgba(0, 120, 215, 0.6), rgba(0, 90, 180, 0.6));
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 30px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    border-radius: 4px;
+}
+
+#hack-button:hover {
+    background: linear-gradient(to bottom, rgba(0, 140, 235, 0.7), rgba(0, 100, 200, 0.7));
+    box-shadow: 0 1px 5px rgba(0, 120, 215, 0.5);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.success-bar {
+    background: linear-gradient(to bottom, #5aff5a, #36ff00) !important;
+    box-shadow: 0 0 15px var(--safe-zone) !important;
+}
+
+.fail-bar {
+    background: linear-gradient(to bottom, #ff5a5a, #ff0000) !important;
+    box-shadow: 0 0 15px #ff0000 !important;
+}
+
+.timer-container {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.timer-bar {
+    height: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timer-progress {
+    height: 100%;
+    background: linear-gradient(to right, #ff3030, #ff7a30);
+    width: 100%;
+    transition: width 0.1s linear;
+    border-radius: 3px;
+}
+
+.timer-text {
+    color: white;
+    text-align: center;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+body, html {
+    background-color: transparent !important;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Common game container styles */
+.game-container {
+    background: linear-gradient(135deg, rgba(15, 30, 45, 0.85) 0%, rgba(30, 60, 90, 0.85) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    width: 600px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    display: none;
+    overflow: hidden;
+}
+
+/* Sequence game specific styles */
+#sequence-container {
+    display: none;
+}
+
+/* Sequence display container - increase height and improve spacing */
+.sequence-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 250px; /* Increased from 150px to provide more vertical space */
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    position: relative;
+    padding: 15px 0; /* Increased padding */
+}
+
+/* Previous keys section - top area */
+.previous-keys {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    min-height: 70px;
+    padding: 10px;
+    margin-bottom: 5px; /* Add space between sections */
+}
+
+/* Current key section - middle area with more prominence */
+.current-key {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 90px; /* Slightly increased for more visibility */
+    padding: 10px;
+    margin: 5px 0; /* Add space between sections */
+}
+
+/* Next keys section - bottom area */
+.next-keys {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    min-height: 70px;
+    padding: 10px;
+    margin-top: 5px; /* Add space between sections */
+}
+
+/* Ensure stage groups are properly centered */
+.stage-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    background: rgba(0, 20, 40, 0.4);
+    padding: 8px; /* Increased padding */
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.key-box {
+    display: flex;
+    align-items: center;     /* Vertical centering */
+    justify-content: center; /* Horizontal centering */
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    background: rgba(0, 20, 40, 0.8);
+    border: 2px solid var(--light-blue);
+    color: white;
+    font-size: 24px;
+    text-align: center;
+    line-height: 1;          /* Reset line height */
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 5px var(--light-blue);
+}
+
+/* Add a style for pressed but not completed state */
+.key-box.pressed {
+    background: rgba(0, 60, 100, 0.8);
+    border-color: var(--light-blue);
+    color: var(--light-blue);
+    /* Keep the same size as current */
+    transform: scale(1);
+}
+
+/* No change to size in pressed state - size only changes when all are complete */
+.key-box.current {
+    background: rgba(0, 40, 80, 0.8);
+    border-color: var(--light-blue);
+    color: var(--light-blue);
+    animation: pulse-glow 1.5s infinite;
+}
+
+.key-box.correct {
+    background: rgba(0, 80, 20, 0.8);
+    border-color: #30ff30;
+    color: #30ff30;
+    transform: scale(0.9);
+}
+
+.key-box.wrong {
+    background: rgba(80, 0, 0, 0.8);
+    border-color: #ff3030;
+    color: #ff3030;
+    animation: none;
+}
+
+.key-box.next {
+    background: rgba(20, 20, 20, 0.6);
+    border-color: #777;
+    color: #777;
+}
+
+.current-key {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.key-box.current {
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 50, 100, 0.6);
+    border: 2px solid var(--neon-blue);
+    color: white;
+    font-size: 30px;
+    box-shadow: 0 0 15px var(--glow);
+    animation: pulse-glow 1.5s infinite;
+}
+
+.key-box.correct {
+    background: rgba(0, 100, 0, 0.6);
+    border-color: var(--safe-zone);
+    box-shadow: 0 0 10px rgba(54, 255, 0, 0.6);
+}
+
+.key-box.wrong {
+    background: rgba(100, 0, 0, 0.6);
+    border-color: #ff3030;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+.sequence-progress {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sequence-attempt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.attempt-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(100, 100, 100, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 5px;
+}
+
+.attempt-indicator.active {
+    background: var(--light-blue);
+    border-color: white;
+    box-shadow: 0 0 10px var(--glow);
+}
+
+.attempt-indicator.success {
+    background: var(--safe-zone);
+    border-color: white;
+    box-shadow: 0 0 10px rgba(54, 255, 0, 0.6);
+}
+
+.attempt-indicator.failure {
+    background: #ff3030;
+    border-color: white;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+.attempt-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+}
+
+.sequence-help {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.key-hint {
+    color: var(--light-blue);
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.seq-timer-progress {
+    height: 100%;
+    background: linear-gradient(to right, #ff3030, #ff7a30);
+    width: 100%;
+    transition: width 0.1s linear;
+    border-radius: 3px;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 5px var(--glow); }
+    50% { box-shadow: 0 0 15px var(--glow); }
+    100% { box-shadow: 0 0 5px var(--glow); }
+}
+
+/* Add time penalty styling */
+.time-penalty {
+    position: absolute;
+    right: 20px;
+    top: 5px;
+    color: #ff3030;
+    font-weight: bold;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    opacity: 0;
+    transform: translateY(0);
+    transition: opacity 0.2s;
+    z-index: 10;
+}
+
+.time-penalty.show {
+    opacity: 1;
+    animation: fadeOutUp 1.5s forwards;
+}
+
+@keyframes fadeOutUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    80% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+}
+
+/* Add styles for stage grouping */
+.stage-group {
+    display: flex;
+    align-items: center;     /* Vertical centering */
+    justify-content: center; /* Ensure keys are centered */
+    margin: 0 10px;
+    background: rgba(0, 20, 40, 0.4);
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.current-stage {
+    background: rgba(0, 40, 80, 0.6);
+    box-shadow: 0 0 10px rgba(0, 120, 215, 0.4);
+}
+
+/* Make sure the containers are also properly aligned */
+.previous-keys, .current-key, .next-keys {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 5px;
+}
+
+/* Style for the time penalty indicator */
+#time-penalty {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #ff5a5a;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+}
+
+#time-penalty.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Circuit Rhythm Game Styles */
+#rhythm-container {
+    display: none;
+}
+
+.rhythm-display {
+    position: relative;
+    height: 400px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.rhythm-highway {
+    display: flex;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.rhythm-lane {
+    position: relative;
+    width: 60px;
+    height: 100%;
+    background: rgba(0, 20, 40, 0.4);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rhythm-note {
+    position: absolute;
+    width: 50px;
+    height: 20px;
+    background: linear-gradient(to bottom, var(--light-blue), var(--neon-blue));
+    border-radius: 4px;
+    left: 5px;
+    box-shadow: 0 0 10px var(--glow);
+    transition: transform 0.1s;
+}
+
+.hit-zone {
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.2), var(--light-blue), rgba(255, 255, 255, 0.2));
+    box-shadow: 0 0 15px var(--glow);
+    z-index: 2;
+}
+
+.key-indicators {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-evenly;
+    z-index: 3;
+}
+
+.key-indicator {
+    width: 50px;
+    height: 40px;
+    background: rgba(0, 40, 80, 0.8);
+    border: 2px solid var(--light-blue);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 0 5px var(--glow);
+}
+
+.key-indicator.active {
+    background: rgba(0, 120, 215, 0.6);
+    box-shadow: 0 0 15px var(--glow);
+    transform: translateY(-5px);
+}
+
+.rhythm-feedback {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    bottom: 60px;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0;
+    transition: all 0.3s;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+}
+
+.feedback-perfect {
+    color: #36ff00;
+}
+
+.feedback-great {
+    color: #00aaff;
+}
+
+.feedback-okay {
+    color: #ffaa00;
+}
+
+.feedback-miss {
+    color: #ff3030;
+}
+
+.feedback-show {
+    opacity: 1;
+    transform: translateY(-20px);
+}
+
+.combo-counter {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+#combo-number {
+    font-size: 40px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    transition: all 0.2s;
+}
+
+#combo-text {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.combo-highlight {
+    color: #36ff00;
+    transform: scale(1.2);
+    text-shadow: 0 0 15px rgba(54, 255, 0, 0.8);
+}
+
+.rhythm-progress {
+    height: 100%;
+    background: linear-gradient(to right, #36ff00, #00aaff);
+    width: 0%;
+    transition: width 0.5s;
+    border-radius: 3px;
+}
+
+.key-help {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* Keymash Game Styles */
+#keymash-container {
+    display: none;
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: auto;
+    background: none;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+}
+
+.progress-circle {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: visible;
+}
+
+.progress-circle svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.progress-background {
+    fill: rgba(0, 0, 0, 0.6);
+    stroke: rgba(0, 40, 80, 0.4);
+    stroke-width: 8;
+    filter: drop-shadow(0 0 8px rgba(0, 30, 60, 0.7));
+    border-radius: 50%;
+}
+
+.progress-bar {
+    fill: transparent;
+    stroke: var(--neon-blue);
+    stroke-width: 8;
+    stroke-dasharray: 283; /* 2πr where r=45 */
+    stroke-dashoffset: 283; /* Start empty */
+    transition: stroke-dashoffset 0.1s linear;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px var(--glow));
+    border-radius: 50%;
+}
+
+/* Add this to ensure the circle shadows render properly */
+.progress-circle::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,20,40,0.5) 0%, rgba(0,0,0,0) 70%);
+    z-index: -1;
+}
+
+.key-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 15px var(--glow);
+}
+
+.key-display.active {
+    color: var(--light-blue);
+    text-shadow: 0 0 20px var(--glow);
+    transform: scale(1.1);
+    transition: all 0.1s;
+}
+
+@keyframes progress-flash {
+    0% { stroke: var(--neon-blue); filter: drop-shadow(0 0 6px var(--glow)); }
+    50% { stroke: var(--safe-zone); filter: drop-shadow(0 0 15px var(--safe-zone)); }
+    100% { stroke: var(--neon-blue); filter: drop-shadow(0 0 6px var(--glow)); }
+}
+
+.progress-flash {
+    animation: progress-flash 0.5s infinite;
+}
+
+/* Add a red flash animation for failure */
+@keyframes failure-flash {
+    0% { stroke: var(--danger-color); filter: drop-shadow(0 0 6px var(--danger-color)); }
+    50% { stroke: #ff3030; filter: drop-shadow(0 0 15px #ff0000); }
+    100% { stroke: var(--danger-color); filter: drop-shadow(0 0 6px var(--danger-color)); }
+}
+
+.failure-flash {
+    animation: failure-flash 0.3s infinite;
+}
+
